@@ -27,6 +27,9 @@ int main(int argc, char **argv)
             output = Lab1::mirror(input, argv[4]);
         if (!strcmp(argv[3], "rotate") && argc == 6)
             output = Lab1::rotate(input, argv[4], atoi(argv[5]));
+        if (!strcmp(argv[3], "prewitt") && argc == 5)
+            output = Lab1::prewitt(input, argv[4]);
+
 
         /* Free input buffer */
         delete input;
