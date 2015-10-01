@@ -23,7 +23,9 @@ int main(int argc, char **argv)
         GrayscaleFloatImage *output = NULL;
         if (!strcmp(argv[3], "invert"))
             output = Lab1::invert(input);
-        
+        if (!strcmp(argv[3], "mirror") && argc == 5)
+            output = Lab1::mirror(input, argv[4]);
+
         /* Free input buffer */
         delete input;
         /* Default case for bad usage */
