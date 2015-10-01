@@ -98,41 +98,52 @@ namespace Lab1
             }
             return dst;
         }
+   
+    template <class T>
+        Image<T>* prewitt(Image<T>* src, const char* dir)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!strcmp(dir, "x"))
+                for (int i = 0; i < src->height(); i++)
+                    for (int j = 0; j < src->width(); j++)
+                        (*dst)(i, j) = (*src)(i + 1, j - 1) + (*src)(i + 1, j) + (*src)(i + 1, j + 1) -
+                            (*src)(i - 1, j - 1) - (*src)(i - 1, j) - (*src)(i - 1, j + 1) + 128;
+            if (!strcmp(dir, "y"))
+                for (int i = 0; i < src->height(); i++)
+                    for (int j = 0; j < src->width(); j++)
+                        (*dst)(i, j) = (*src)(i - 1, j - 1) + (*src)(i, j - 1) + (*src)(i + 1, j - 1) -
+                            (*src)(i - 1, j + 1) - (*src)(i, j + 1) - (*src)(i + 1, j + 1) + 128;
+            return dst;
+        }
 
-        template <class T>
-            Image<T>* prewitt(Image<T>* src, const char* dir)
-            {
-                Image<T>* dst = new Image<T>(src->width(), src->height());
-                if (!strcmp(dir, "x"))
-                    for (int i = 0; i < src->height(); i++)
-                        for (int j = 0; j < src->width(); j++)
-                            (*dst)(i, j) = (*src)(i + 1, j - 1) + (*src)(i + 1, j) + (*src)(i + 1, j + 1) -
-                                (*src)(i - 1, j - 1) - (*src)(i - 1, j) - (*src)(i - 1, j + 1) + 128;
-                if (!strcmp(dir, "y"))
-                    for (int i = 0; i < src->height(); i++)
-                        for (int j = 0; j < src->width(); j++)
-                            (*dst)(i, j) = (*src)(i - 1, j - 1) + (*src)(i, j - 1) + (*src)(i + 1, j - 1) -
-                                (*src)(i - 1, j + 1) - (*src)(i, j + 1) - (*src)(i + 1, j + 1) + 128;
-                return dst;
-            }
-
-            
-        template <class T>
-            Image<T>* sobel(Image<T>* src, const char* dir)
-            {
-                Image<T>* dst = new Image<T>(src->width(), src->height());
-                if (!strcmp(dir, "x"))
-                    for (int i = 0; i < src->height(); i++)
-                        for (int j = 0; j < src->width(); j++)
-                            (*dst)(i, j) = (*src)(i + 1, j - 1) + 2*(*src)(i + 1, j) + (*src)(i + 1, j + 1) -
-                                (*src)(i - 1, j - 1) - 2*(*src)(i - 1, j) - (*src)(i - 1, j + 1) + 128;
-                if (!strcmp(dir, "y"))
-                    for (int i = 0; i < src->height(); i++)
-                        for (int j = 0; j < src->width(); j++)
-                            (*dst)(i, j) = (*src)(i - 1, j - 1) + 2*(*src)(i, j - 1) + (*src)(i + 1, j - 1) -
-                                (*src)(i - 1, j + 1) - 2*(*src)(i, j + 1) - (*src)(i + 1, j + 1) + 128;
-                return dst;
-            }
+        
+    template <class T>
+        Image<T>* sobel(Image<T>* src, const char* dir)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!strcmp(dir, "x"))
+                for (int i = 0; i < src->height(); i++)
+                    for (int j = 0; j < src->width(); j++)
+                        (*dst)(i, j) = (*src)(i + 1, j - 1) + 2*(*src)(i + 1, j) + (*src)(i + 1, j + 1) -
+                            (*src)(i - 1, j - 1) - 2*(*src)(i - 1, j) - (*src)(i - 1, j + 1) + 128;
+            if (!strcmp(dir, "y"))
+                for (int i = 0; i < src->height(); i++)
+                    for (int j = 0; j < src->width(); j++)
+                        (*dst)(i, j) = (*src)(i - 1, j - 1) + 2*(*src)(i, j - 1) + (*src)(i + 1, j - 1) -
+                            (*src)(i - 1, j + 1) - 2*(*src)(i, j + 1) - (*src)(i + 1, j + 1) + 128;
+            return dst;
+        }
+        
+    template <class T>
+        /* dir: 1 - main, 2 - sub */
+        Image<T>* roberts(Image<T>* src, int dir)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    (*dst)(i, j) = (dir - 1 ? (*src)(i + 1, j + 1) - (*src)(i, j) : (*src)(i + 1, j) - (*src)(i, j + 1)) + 128;
+            return dst;
+        }
 }
 
 #endif //_LAB1_H_
