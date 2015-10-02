@@ -163,6 +163,33 @@ namespace Lab1
             delete[] array;
             return dst;
         }
+    
+    template <class T>
+        Image<T>* gauss(Image<T>* src, float sigma)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            Image<T>* med = new Image<T>(src->width(), src->height());
+            int r = (int)(3*sigma);
+            T* kernel = new T[2*r + 1];
+            T norm = 0;
+            for (int i = 0; i < 2*r + 1; i++)
+            {
+                kernel[i] = (T)exp(-pow(r - i, 2) / (2 * pow(sigma, 2)));
+                norm += kernel[i];
+            }
+            for (int i = 0; i < 2*r + 1; i++)
+                kernel[i] /= norm;
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    for (int n = j - r, k = 0; n <= j + r; n++, k++)
+                        (*med)(i, j) += kernel[k] * (*src)(i, n);
+            for (int j = 0; j < src->width(); j++)
+                for (int i = 0; i < src->height(); i++)
+                    for (int n = i - r, k = 0; n <= i + r; n++, k++)
+                        (*dst)(i, j) += kernel[k] * (*med)(n, j);
+            delete med;
+            return dst;
+        }
 }
 
 #endif //_LAB1_H_

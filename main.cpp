@@ -35,6 +35,8 @@ int main(int argc, char **argv)
             output = Lab1::roberts(input, atoi(argv[4]));
         if (!strcmp(argv[3], "median") && argc == 5)
             output = Lab1::median(input, atoi(argv[4]));
+        if (!strcmp(argv[3], "gauss") && argc == 5)
+            output = Lab1::gauss(input, atof(argv[4]));
 
         /* Free input buffer */
         delete input;
