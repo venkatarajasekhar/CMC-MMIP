@@ -37,6 +37,8 @@ int main(int argc, char **argv)
             output = Lab1::median(input, atoi(argv[4]));
         if (!strcmp(argv[3], "gauss") && argc == 5)
             output = Lab1::gauss(input, atof(argv[4]));
+        if (!strcmp(argv[3], "gradient") && argc == 5)
+            output = Lab1::gradient(input, atof(argv[4]));
 
         /* Free input buffer */
         delete input;

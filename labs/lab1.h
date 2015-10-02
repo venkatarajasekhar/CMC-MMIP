@@ -190,6 +190,38 @@ namespace Lab1
             delete med;
             return dst;
         }
+    
+    template <class T>
+        Image<T>* gradient(Image<T>* src, float sigma)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            Image<T>* x = new Image<T>(src->width(), src->height());
+            Image<T>* y = new Image<T>(src->width(), src->height());
+            int r = (int)(3*sigma);
+            T* kernel = new T[2*r + 1];
+            T norm = 0;
+            for (int i = 0; i < 2*r + 1; i++)
+            {
+                kernel[i] = (T)((r - i) / sigma * exp(-pow(r - i, 2) / (2 * pow(sigma, 2))));
+                norm += fabs(kernel[i]);
+            }
+            for (int i = 0; i < 2*r + 1; i++)
+                kernel[i] /= norm;
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    for (int n = j - r, k = 0; n <= j + r; n++, k++)
+                        (*x)(i, j) += kernel[k] * (*src)(i, n);
+            for (int j = 0; j < src->width(); j++)
+                for (int i = 0; i < src->height(); i++)
+                    for (int n = i - r, k = 0; n <= i + r; n++, k++)
+                        (*y)(i ,j) += kernel[k] * (*src)(n, j);
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    (*dst)(i, j) = (float)sqrt(pow((*x)(i, j), 2) + pow((*y)(i, j), 2));
+            delete x;
+            delete y;
+            return dst;
+        }
 }
 
 #endif //_LAB1_H_
