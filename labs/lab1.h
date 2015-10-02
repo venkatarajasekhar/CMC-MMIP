@@ -144,6 +144,25 @@ namespace Lab1
                     (*dst)(i, j) = (dir - 1 ? (*src)(i + 1, j + 1) - (*src)(i, j) : (*src)(i + 1, j) - (*src)(i, j + 1)) + 128;
             return dst;
         }
+    
+    template <class T>
+        Image<T>* median(Image<T>* src, int r)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            T* array = new T[(2*r + 1)*(2*r + 1)];
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                {
+                    int counter = 0;
+                    for (int k = i - r; k <= i + r; k++)
+                        for (int n = j - r; n <= j + r; n++)
+                            array[counter++] = (*src)(k, n);
+                    std::sort(array, array + (2*r + 1) * (2*r + 1));
+                    (*dst)(i, j) = array[2*r*(r + 1) + 1];
+                }
+            delete[] array;
+            return dst;
+        }
 }
 
 #endif //_LAB1_H_

@@ -33,6 +33,8 @@ int main(int argc, char **argv)
             output = Lab1::sobel(input, argv[4]);
         if (!strcmp(argv[3], "roberts") && argc == 5)
             output = Lab1::roberts(input, atoi(argv[4]));
+        if (!strcmp(argv[3], "median") && argc == 5)
+            output = Lab1::median(input, atoi(argv[4]));
 
         /* Free input buffer */
         delete input;
