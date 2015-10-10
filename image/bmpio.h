@@ -40,7 +40,8 @@ class BmpRead
         enum Type
         {
             BT_INDEX,
-            BT_RGB
+            BT_RGB,
+            BT_RGBX
         };
     private:
         FILE* _file;
@@ -66,7 +67,8 @@ class BmpWrite
         enum Type
         {
             BT_INDEX,
-            BT_RGB
+            BT_RGB,
+            BT_RGBX
         };
     private:
         FILE* _file;

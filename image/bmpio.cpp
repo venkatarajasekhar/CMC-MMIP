@@ -11,6 +11,9 @@ size_t _row_length(size_t width, int bits)
         case 24:
             bytes_per_row = 3 * width;
             break;
+        case 32:
+            bytes_per_row = 4 * width;
+            break;
         default:
             throw "Not supported type of pixel format";
     };
@@ -45,6 +48,9 @@ BmpRead::BmpRead(const char* filename)
                 break;
             case 24:
                 _image_type = BT_RGB;
+                break;
+            case 32:
+                _image_type = BT_RGBX;
                 break;
             default:
                 throw "BmpRead: Not supported type of pixel format";
@@ -87,6 +93,9 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
                 break;
             case BT_RGB:
                 bits = 24;
+                break;
+            case BT_RGBX:
+                bits = 32;
                 break;
             default:
                 throw "BmpWrite: Not supported type of pixel format";

@@ -36,6 +36,17 @@ namespace ImageIO
                         }
                         delete[] _data;
                         break;
+                    case BmpRead::BT_RGBX:
+                        _data = new unsigned char[_width * 4];
+                        for (int i = _height - 1; i >= 0; i--)
+                        {
+                            _bmp_input.read(_data, i, 0, _width * 4);
+                            for (int j = 0; j < _width; j++)
+                                (*_input)(i, j) =
+                                    0.1140 * _data[4*j] + 0.5871 * _data[4*j + 1] + 0.2989 * _data[4*j + 2];
+                        }
+                        delete[] _data;
+                        break;
                     default:
                         delete _input;
                         _input = NULL;
