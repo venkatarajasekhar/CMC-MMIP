@@ -14,8 +14,7 @@ size_t _row_length(size_t width, int bits)
         default:
             throw "Not supported type of pixel format";
     };
-    bytes_per_row = (bytes_per_row + 3) / 4 * 4;
-    return bytes_per_row;
+    return (bytes_per_row + 3) /4 * 4;    
 }
 
 BmpRead::BmpRead(const char* filename)
@@ -35,9 +34,9 @@ BmpRead::BmpRead(const char* filename)
         /* info header loading */
         if (!fread(&_info, sizeof(_info), 1, _file))
             throw "BmpRead: Info header could not be read";
-        
+
         /* field initialization */
-        _data_offset = _header._dw_offset;      
+        _data_offset = _header._dw_offset;
         _bytes_per_row = _row_length(_info._dw_width, _info._w_bit_count);
         switch(_info._w_bit_count)
         {
@@ -53,7 +52,8 @@ BmpRead::BmpRead(const char* filename)
     }
     catch (...)
     {
-        fclose(_file);
+        if (_file)
+            fclose(_file);
         throw;
     }
 }
@@ -67,30 +67,32 @@ size_t BmpRead::width() const { return _info._dw_width; }
 size_t BmpRead::height() const { return _info._dw_height; }
 size_t BmpRead::bits() const { return _info._w_bit_count; }
 BmpRead::Type BmpRead::type() const { return _image_type; }
-int BmpRead::read(unsigned char* pixel, size_t i, size_t j)
+int BmpRead::read(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length)
 {
     fseek(_file, _data_offset + (_info._dw_height - 1 - i) * _bytes_per_row + j, SEEK_SET);
-    return fread(pixel, sizeof(pixel), 1, _file);
+    return fread(pixel, sizeof(*pixel), length, _file);
 }
 
-BmpWrite::BmpWrite(const char* filename, int width, int height, BmpWrite::Type type)
+BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::Type type)
 {
     try
     {
         /* field initialization */
-        int bits;
+        int bits = 0;
+        _image_type = type;
         switch(_image_type)
         {
             case BT_INDEX:
                 bits = 8;
+                break;
             case BT_RGB:
                 bits = 24;
+                break;
             default:
                 throw "BmpWrite: Not supported type of pixel format";
         };
         _bytes_per_row = _row_length(width, bits);
         _data_offset = sizeof(_header) + sizeof(_info) + (bits == 24 ? 0 : 4 * (1 << bits));
-        _image_type = type;
         
         /* file header and info header creating */
         _header._w_type = 0x4d42;
@@ -98,12 +100,12 @@ BmpWrite::BmpWrite(const char* filename, int width, int height, BmpWrite::Type t
         _header._w_reserved_2 = 0;
         _header._dw_offset = _data_offset;
         _info._dw_size_of_header = sizeof(_info);
-        _info._dw_width = (unsigned long) width;
-        _info._dw_height = (unsigned long) height;
+        _info._dw_width = (unsigned int) width;
+        _info._dw_height = (unsigned int) height;
         _info._w_planes = 1;
         _info._w_bit_count = bits;
         _info._dw_compression_method = 0;
-        _info._dw_size_of_image = bits / sizeof(unsigned char) * width * height;
+        _info._dw_size_of_image = _bytes_per_row * height;
         _info._dw_pixels_per_X = 0;
         _info._dw_pixels_per_Y = 0;
         _info._dw_colors = 0;
@@ -123,7 +125,8 @@ BmpWrite::BmpWrite(const char* filename, int width, int height, BmpWrite::Type t
     }
     catch (...)
     {
-        fclose(_file);
+        if (_file)
+            fclose(_file);
         throw;
     }
 }
@@ -137,8 +140,8 @@ size_t BmpWrite::width() const { return _info._dw_width; }
 size_t BmpWrite::height() const { return _info._dw_height; }
 size_t BmpWrite::bits() const { return _info._w_bit_count; }
 BmpWrite::Type BmpWrite::type() const { return _image_type; }
-int BmpWrite::write(unsigned char* pixel, size_t i, size_t j)
+int BmpWrite::write(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length)
 {
     fseek(_file, _data_offset + (_info._dw_height - 1 - i) * _bytes_per_row + j, SEEK_SET);
-    return fwrite(pixel, sizeof(pixel), 1, _file);
+    return fwrite(pixel, sizeof(*pixel), length, _file);
 }

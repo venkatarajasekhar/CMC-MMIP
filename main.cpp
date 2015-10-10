@@ -2,7 +2,7 @@
 #include <cstdio>
 #include "image.h"
 #include "imageio.h"
-#include "lab1/lab1.h"
+#include "labs/lab1.h"
 
 int main(int argc, char **argv)
 {
