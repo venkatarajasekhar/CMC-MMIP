@@ -1,5 +1,5 @@
 #include "image.h"
-#include "image/bmpio.h"
+#include "bmpio.h"
 
 namespace ImageIO
 {

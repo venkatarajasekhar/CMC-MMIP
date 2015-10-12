@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <cmath>
-#include "../image.h"
+#include "image.h"
 
 namespace Lab1
 {
