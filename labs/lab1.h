@@ -149,7 +149,7 @@ namespace Lab1
         Image<T>* median(Image<T>* src, int r)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
-            T* array = new T[(2*r + 1)*(2*r + 1)];
+            T array[(2*r + 1)*(2*r + 1)];
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                 {
@@ -160,7 +160,6 @@ namespace Lab1
                     std::sort(array, array + (2*r + 1) * (2*r + 1));
                     (*dst)(i, j) = array[2*r*(r + 1) + 1];
                 }
-            delete[] array;
             return dst;
         }
     
@@ -170,7 +169,7 @@ namespace Lab1
             Image<T>* dst = new Image<T>(src->width(), src->height());
             Image<T>* med = new Image<T>(src->width(), src->height());
             int r = (int)(3*sigma);
-            T* kernel = new T[2*r + 1];
+            T kernel[2*r + 1];
             T norm = 0;
             for (int i = 0; i < 2*r + 1; i++)
             {
@@ -198,7 +197,7 @@ namespace Lab1
             Image<T>* x = new Image<T>(src->width(), src->height());
             Image<T>* y = new Image<T>(src->width(), src->height());
             int r = (int)(3*sigma);
-            T* kernel = new T[2*r + 1];
+            T kernel[2*r + 1];
             T norm = 0;
             for (int i = 0; i < 2*r + 1; i++)
             {
@@ -220,6 +219,29 @@ namespace Lab1
                     (*dst)(i, j) = (float)sqrt(pow((*x)(i, j), 2) + pow((*y)(i, j), 2));
             delete x;
             delete y;
+            return dst;
+        }
+
+    template <class T>
+        Image<T>* gabor(Image<T>* src, float sigma, float gamma, float theta, float lambda, float psi)
+        {
+            Image<T>* dst = new Image<T>(src->width(), src->height());
+            int r = (int)(3*sigma);
+            const float _theta = theta / 45 * atan(1);
+            const float _psi = theta / 45 * atan(1);
+            T kernel[2*r + 1][2*r + 1];
+            for (int i = 0; i < 2*r + 1; i++)
+                for (int j = 0; j < 2*r + 1; j++)
+                {
+                    float x = i * sin(_theta) + j * cos(_theta);
+                    float y = i * cos(_theta) - j * sin(_theta);
+                    kernel[i][j] = (T)(exp(-(pow(x, 2) + pow(gamma * y, 2)) / (2 * pow(sigma, 2))) * cos(8 * atan(1) / lambda * x + _psi));
+                }
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    for (int _i = i - r, n = 0; _i <= i + r; _i++, n++)
+                        for (int _j = j - r, k = 0; _j <= j + r; _j++, k++)
+                            (*dst)(i, j) += kernel[n][k] * (*src)(_i, _j);
             return dst;
         }
 }

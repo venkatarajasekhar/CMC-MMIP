@@ -39,6 +39,8 @@ int main(int argc, char **argv)
             output = Lab1::gauss(input, atof(argv[4]));
         if (!strcmp(argv[3], "gradient") && argc == 5)
             output = Lab1::gradient(input, atof(argv[4]));
+        if (!strcmp(argv[3], "gabor") && argc == 9)
+            output = Lab1::gabor(input, atof(argv[4]), atof(argv[5]), atof(argv[6]), atof(argv[7]), atof(argv[8]));
 
         /* Free input buffer */
         delete input;
