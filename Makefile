@@ -6,25 +6,25 @@ PROJECT= ${PWD}
 CFLAGS = -Wall
 INCLUDES = -I$(PROJECT) -I$(PROJECT)/image -I$(PROJECT)/labs
 LFLAGS = -L$(PROJECT)/image
+LIBS = -lbmpio
 # Files
-SOURCES = main.cpp image/bmpio.cpp
+SOURCES = main.cpp
 TARGETS = $(SOURCES:.cpp=.o)
 EXECUTABLE = out
 
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(TARGETS)
-	$(XX) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LFLAGS)
+$(EXECUTABLE): $(TARGETS) lib
+	$(XX) $(CFLAGS) $(INCLUDES) -o $@ $< $(LFLAGS) $(LIBS)
 
-.cpp.o:
+%.o: %.cpp
 	$(XX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-.PHONY: depend clean
+lib:
+	$(MAKE) -C image
+
+.PHONY: all clean lib
 
 clean:
 	$(RM) *.o *~ $(EXECUTABLE)
-
-depend: $(SOURCES)
-	makedepend $(INCLUDES) $^
-
-
+	cd $(PROJECT)/image && $(MAKE) clean
