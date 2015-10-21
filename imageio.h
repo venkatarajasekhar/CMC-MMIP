@@ -13,17 +13,24 @@ namespace ImageIO
                 const int _height = _bmp_input.height();
                 Image<T>* _input = new Image<T>(_width, _height);
                 unsigned char* _data = NULL;
+                unsigned char* _rgb = NULL;
                 switch (_bmp_input.type())
                 {
                     case BmpRead::BT_INDEX:
                         _data = new unsigned char[_width];
+                        _rgb = new unsigned char[3];
                         for (int i = _height - 1; i >= 0; i--)
                         {
                             _bmp_input.read(_data, i, 0, _width);
                             for (int j = 0; j < _width; j++)
-                                (*_input)(i, j) = _data[j];
+                            {
+                                _bmp_input.Paleterize(_rgb, _data[j]);
+                                (*_input)(i, j) =
+                                    0.1140 * _rgb[0] + 0.5871 * _rgb[1] + 0.2989 * _rgb[2];
+                            }
                         }
                         delete[] _data;
+                        delete[] _rgb;
                         break;
                     case BmpRead::BT_RGB:
                         _data = new unsigned char[_width * 3];
@@ -69,17 +76,16 @@ namespace ImageIO
                     throw "ImageIO::write: Nothing could be saved\n";
                 const int _width = _output->width();
                 const int _height = _output->height();
-                BmpWrite _bmp_output(filename, _width, _height, BmpWrite::BT_RGB);
-                unsigned char* _data = new unsigned char[_width * 3];
+                BmpWrite _bmp_output(filename, _width, _height, BmpWrite::BT_INDEX);
+                unsigned char* _data = new unsigned char[_width];
                 for (int i = _height; i >= 0; i--)
                 {
                     for (int j = 0; j < _width; j++)
                     {
                         T value = (*_output)(i, j);
-                        _data[3*j + 2] = _data[3*j + 1] = _data[3*j] = 
-                            (unsigned char)(value < 0 ? 0 : (value > 255 ? 255 : value));
+                        _data[j] = (unsigned char)(value < 0 ? 0 : (value > 255 ? 255 : value));
                     }
-                    _bmp_output.write(_data, i, 0, _width * 3);
+                    _bmp_output.write(_data, i, 0, _width);
                 }
                 delete[] _data;
                 return 0;

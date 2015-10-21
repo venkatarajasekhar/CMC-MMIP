@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstddef>
+#include <cstring>
 
 #pragma pack(push, 1)
 struct BitmapFileHeader
@@ -49,6 +50,8 @@ class BmpRead
         BitmapInfoHeader _info;
         size_t _data_offset;
         size_t _bytes_per_row;
+        size_t _size_of_palette;
+        unsigned char* _palette;
         Type _image_type;
     public:
         BmpRead(const char* filename);
@@ -57,6 +60,7 @@ class BmpRead
         size_t height() const;
         size_t bits() const;
         Type type() const;
+        void Paleterize(unsigned char* rgb, short int index) const;
         int read(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length);
 };
 
@@ -76,6 +80,8 @@ class BmpWrite
         BitmapInfoHeader _info;
         size_t _data_offset;
         size_t _bytes_per_row;
+        size_t _size_of_palette;
+        unsigned char* _palette;
         Type _image_type;
     public:
         BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::Type type);
