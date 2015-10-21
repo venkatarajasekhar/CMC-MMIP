@@ -14,8 +14,8 @@ EXECUTABLE = out
 
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(TARGETS) lib
-	$(XX) $(CFLAGS) $(INCLUDES) -o $@ $< $(LFLAGS) $(LIBS)
+$(EXECUTABLE): lib $(TARGETS)
+	$(XX) -o $@ $(TARGETS) $(LFLAGS) $(LIBS)
 
 %.o: %.cpp
 	$(XX) $(CFLAGS) $(INCLUDES) -c $< -o $@
