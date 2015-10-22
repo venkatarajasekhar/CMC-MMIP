@@ -17,13 +17,14 @@ size_t _row_length(size_t width, int bits)
         default:
             throw "Not supported type of pixel format";
     };
-    return (bytes_per_row + 3) /4 * 4;    
+    return (bytes_per_row + 3) / 4 * 4;
 }
 
 BmpRead::BmpRead(const char* filename)
 {
     try
     {
+        _palette = NULL;
         _file = fopen(filename, "rb");
         if (!_file)
             throw "BmpRead: File could not be opened";
@@ -37,6 +38,9 @@ BmpRead::BmpRead(const char* filename)
         /* info header loading */
         if (!fread(&_info, sizeof(_info), 1, _file))
             throw "BmpRead: Info header could not be read";
+        /* check if compression method is compatible */
+        if (_info._dw_compression_method)
+            throw "BmpRead: Incompatible compression method";
 
         /* field initialization */
         _data_offset = _header._dw_offset;
@@ -102,6 +106,7 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
     {
         /* field initialization */
         int bits = 0;
+        _palette = NULL;
         _image_type = type;
         switch(_image_type)
         {
@@ -116,16 +121,20 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
                 }
                 break;
             case BT_RGB:
+                _size_of_palette = 0;
+                _palette = NULL;
                 bits = 24;
                 break;
             case BT_RGBX:
                 bits = 32;
+                _size_of_palette = 0;
+                _palette = NULL;
                 break;
             default:
                 throw "BmpWrite: Not supported type of pixel format";
         };
         _bytes_per_row = _row_length(width, bits);
-        _data_offset = sizeof(_header) + sizeof(_info) + (bits == 24 ? 0 : 4 * (1 << bits));
+        _data_offset = sizeof(_header) + sizeof(_info) + (bits > 8 ? 0 : 4 * (1 << bits));
         
         /* file header and info header creating */
         _header._w_type = 0x4d42;
@@ -141,7 +150,7 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
         _info._dw_size_of_image = _bytes_per_row * height;
         _info._dw_pixels_per_X = 0;
         _info._dw_pixels_per_Y = 0;
-        _info._dw_colors = 0;
+        _info._dw_colors = _size_of_palette;
         _info._dw_important_colors = 0;
         _header._dw_file_size = _header._dw_offset + _info._dw_size_of_image;
 
@@ -156,7 +165,7 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
         if (!fwrite(&_info, sizeof(_info), 1, _file))
             throw "BmpWrite: Info header could not be saved";
         /* palette saving */
-        if (!fwrite(_palette, sizeof(*_palette), _size_of_palette * 4, _file))
+        if (_palette && !fwrite(_palette, sizeof(*_palette), _size_of_palette * 4, _file))
             throw "BmpWrite: Color palette could not be saved";
     }
     catch (...)

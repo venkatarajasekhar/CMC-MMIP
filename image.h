@@ -28,7 +28,6 @@ template<class PixelType>
  * Availible types of images
  */
 typedef Image<float> GrayscaleFloatImage;
-typedef Image<std::complex<float> > GrayscaleComplexImage;
 
 /*
  * Implementation of Image template

@@ -1,3 +1,6 @@
+#ifndef _IMAGEIO_H_
+#define _IMAGEIO_H_
+
 #include "image.h"
 #include "bmpio.h"
 
@@ -78,7 +81,7 @@ namespace ImageIO
                 const int _height = _output->height();
                 BmpWrite _bmp_output(filename, _width, _height, BmpWrite::BT_INDEX);
                 unsigned char* _data = new unsigned char[_width];
-                for (int i = _height; i >= 0; i--)
+                for (int i = _height - 1; i >= 0; i--)
                 {
                     for (int j = 0; j < _width; j++)
                     {
@@ -97,3 +100,5 @@ namespace ImageIO
             }
         }
 }
+
+#endif /* _IMAGEIO_H_ */
