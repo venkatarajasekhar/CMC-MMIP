@@ -80,16 +80,16 @@ namespace Lab1
             /* rotation on random angle */
             else
             {
-                float rad_angle = (float)(((!strcmp(dir, "ccw") ? angle : 90 - angle) % 90) * atan(1) / 45);
-                int new_height = (int)round(sqrt(pow(src->width(), 2) + pow(src->height(), 2)) *
+                const float rad_angle = (float)(((!strcmp(dir, "ccw") ? angle : 90 - angle) % 90) * atan(1) / 45);
+                const int new_height = (int)round(sqrt(pow(src->width(), 2) + pow(src->height(), 2)) *
                         sin(atan((float)src->height() / (float)src->width()) + rad_angle));
-                int new_width = (int)round(sqrt(pow(src->width(), 2) + pow(src->height(), 2)) *
+                const int new_width = (int)round(sqrt(pow(src->width(), 2) + pow(src->height(), 2)) *
                         sin(atan((float)src->width() / (float)src->height()) + rad_angle));
+                const int dx = (new_width - src->width()) / 2;
+                const int dy = (new_height - src->height()) / 2;
                 Image<T>* med = new Image<T>(new_width, new_height);
                 if (!med)
                     throw "Lab1::rotate: Insufficient memory to allocate mediocre image";
-                int dx = (new_width - src->width()) / 2;
-                int dy = (new_height - src->height()) / 2;
                 for (int i = 0; i < new_height; i++)
                     for (int j = 0; j < new_width; j++)
                     {
