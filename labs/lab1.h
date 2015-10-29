@@ -264,9 +264,9 @@ namespace Lab1
             Image<T>* dst = new Image<T>(src->width(), src->height());
             if (!dst)
                 throw "Lab1::gabor: Insufficient memory to allocate output image";
-            int r = (int)(3*sigma);
+            int r = (int)(3 * std::max(sigma, sigma / gamma));
             const float _theta = theta / 45 * atan(1);
-            const float _psi = theta / 45 * atan(1);
+            const float _psi = psi / 45 * atan(1);
             T** kernel = new T*[2*r + 1];
             if (!kernel)
                 throw "Lab1::gabor: Insufficient memory to allocate kernel";
@@ -279,15 +279,15 @@ namespace Lab1
             for (int i = 0; i < 2*r + 1; i++)
                 for (int j = 0; j < 2*r + 1; j++)
                 {
-                    float x = i * sin(_theta) + j * cos(_theta);
-                    float y = i * cos(_theta) - j * sin(_theta);
+                    float x = (r - i) * sin(_theta) + (r - j) * cos(_theta);
+                    float y = (r - i) * cos(_theta) - (r - j) * sin(_theta);
                     kernel[i][j] = (T)(exp(-(pow(x, 2) + pow(gamma * y, 2)) / (2 * pow(sigma, 2))) * cos(8 * atan(1) / lambda * x + _psi));
                 }
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
-                    for (int _i = i - r, n = 0; _i <= i + r; _i++, n++)
-                        for (int _j = j - r, k = 0; _j <= j + r; _j++, k++)
-                            (*dst)(i, j) += kernel[n][k] * (*src)(_i, _j);
+                    for (int y = i - r, n = 0; y <= i + r; y++, n++)
+                        for (int x = j - r, k = 0; x <= j + r; x++, k++)
+                            (*dst)(i, j) += kernel[n][k] * (*src)(y, x);
             for (int i = 0; i < 2*r + 1; i++)
                 delete[] kernel[i];
             delete[] kernel;
