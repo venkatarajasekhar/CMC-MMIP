@@ -12,6 +12,8 @@ namespace Lab1
         Image<T>* invert(Image<T>* src)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::invert: Insufficient memory to allocate output image";
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                     (*dst)(i, j) = 255 - (*src)(i, j);
@@ -22,8 +24,10 @@ namespace Lab1
         /* _dir: 0 - x, 1 - y */
         Image<T>* mirror(Image<T>* src, const char* dir)
         {
-            int _dir = !strcmp(dir, "x") && strcmp(dir, "y") ? 0 : 1;
+            int _dir = !strcmp(dir, "x") ? 0 : 1;
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                 throw "Lab1::mirror: Insufficient memory to allocate output image";
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                     (*dst)(i, j) = (*src)(_dir ? i : src->height() - 1 - i, _dir ? src->width() - 1 - j : j);
@@ -39,6 +43,8 @@ namespace Lab1
                 if ((!strcmp(dir, "cw") && angle / 90 % 4 == 1) || (!strcmp(dir, "ccw") && angle / 90 % 4 == 3))
                 {
                     dst = new Image<T>(src->height(), src->width());
+                    if (!dst)
+                        throw "Lab1::rotate: Insufficient memory to allocate output image";
                     for (int i = 0; i < src->height(); i++)
                         for (int j = 0; j < src->width(); j++)
                             (*dst)(j, src->height() - i - 1) = (*src)(i, j);
@@ -46,6 +52,8 @@ namespace Lab1
                 if ((!strcmp(dir, "cw") && angle / 90 % 4 == 3) || (!strcmp(dir, "ccw") && angle / 90 % 3 == 1))
                 {
                     dst = new Image<T>(src->height(), src->width());
+                    if (!dst)
+                        throw "Lab1::rotate: Insufficient memory to allocate output image";
                     for (int i = 0; i < src->height(); i++)
                         for (int j = 0; j < src->width(); j++)
                             (*dst)(src->width() - j - 1, i) = (*src)(i, j);
@@ -53,6 +61,8 @@ namespace Lab1
                 if (angle / 90 % 4 == 2)
                 {
                     dst = new Image<T>(src->width(), src->height());
+                    if (!dst)
+                        throw "Lab1::rotate: Insufficient memory to allocate output image";
                     for (int i = 0; i < src->height(); i++)
                         for (int j = 0; j < src->width(); j++)
                             (*dst)(i, j) = (*src)(src->height() - 1 - i, src->width() - 1 - j);
@@ -60,6 +70,8 @@ namespace Lab1
                 if (!(angle / 90 % 4))
                 {
                     dst = new Image<T>(src->width(), src->height());
+                    if (!dst)
+                        throw "Lab1::rotate: Insufficient memory to allocate output image";
                     for (int i = 0; i < src->height(); i++)
                         for (int j = 0; j < src->width(); j++)
                             (*dst)(i, j) = (*src)(i, j);
@@ -74,6 +86,8 @@ namespace Lab1
                 int new_width = (int)round(sqrt(pow(src->width(), 2) + pow(src->height(), 2)) *
                         sin(atan((float)src->width() / (float)src->height()) + rad_angle));
                 Image<T>* med = new Image<T>(new_width, new_height);
+                if (!med)
+                    throw "Lab1::rotate: Insufficient memory to allocate mediocre image";
                 int dx = (new_width - src->width()) / 2;
                 int dy = (new_height - src->height()) / 2;
                 for (int i = 0; i < new_height; i++)
@@ -103,6 +117,8 @@ namespace Lab1
         Image<T>* prewitt(Image<T>* src, const char* dir)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::prewitt: Insufficient memory to allocate output image";
             if (!strcmp(dir, "x"))
                 for (int i = 0; i < src->height(); i++)
                     for (int j = 0; j < src->width(); j++)
@@ -121,6 +137,8 @@ namespace Lab1
         Image<T>* sobel(Image<T>* src, const char* dir)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::sobel: Insufficient memory to allocate output image";
             if (!strcmp(dir, "x"))
                 for (int i = 0; i < src->height(); i++)
                     for (int j = 0; j < src->width(); j++)
@@ -139,6 +157,8 @@ namespace Lab1
         Image<T>* roberts(Image<T>* src, int dir)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::roberts: Insufficient memory to allocate output image";
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                     (*dst)(i, j) = (dir - 1 ? (*src)(i + 1, j + 1) - (*src)(i, j) : (*src)(i + 1, j) - (*src)(i, j + 1)) + 128;
@@ -149,7 +169,11 @@ namespace Lab1
         Image<T>* median(Image<T>* src, int r)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
-            T array[(2*r + 1)*(2*r + 1)];
+            if (!dst)
+                throw "Lab1::median: Insufficient memory to allocate output image";
+            T* array = new T[(2*r + 1) * (2*r + 1)];
+            if (!array)
+                throw "Lab1::median: Insufficient memory to allocate buffer";
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                 {
@@ -167,9 +191,15 @@ namespace Lab1
         Image<T>* gauss(Image<T>* src, float sigma)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::gauss: Insufficient memory to allocate output image";
             Image<T>* med = new Image<T>(src->width(), src->height());
+            if (!med)
+                throw "Lab1::gauss: Insufficient memory to allocate mediocre image";
             int r = (int)(3*sigma);
-            T kernel[2*r + 1];
+            T* kernel = new T[2*r + 1];
+            if (!kernel)
+                throw "Lab1::gauss: Insufficient memory to allocate kernel";
             T norm = 0;
             for (int i = 0; i < 2*r + 1; i++)
             {
@@ -194,10 +224,16 @@ namespace Lab1
         Image<T>* gradient(Image<T>* src, float sigma)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::gradient: Insufficient memory to allocate output image";
             Image<T>* x = new Image<T>(src->width(), src->height());
             Image<T>* y = new Image<T>(src->width(), src->height());
+            if (!x || !y)
+                throw "Lab1::gradient: Insufficient memory to allocate mediocre image";
             int r = (int)(3*sigma);
-            T kernel[2*r + 1];
+            T* kernel = new T[2*r + 1];
+            if (!kernel)
+                throw "Lab1::gradient: Insufficient memory to allocate kernel";
             T norm = 0;
             for (int i = 0; i < 2*r + 1; i++)
             {
@@ -226,10 +262,20 @@ namespace Lab1
         Image<T>* gabor(Image<T>* src, float sigma, float gamma, float theta, float lambda, float psi)
         {
             Image<T>* dst = new Image<T>(src->width(), src->height());
+            if (!dst)
+                throw "Lab1::gabor: Insufficient memory to allocate output image";
             int r = (int)(3*sigma);
             const float _theta = theta / 45 * atan(1);
             const float _psi = theta / 45 * atan(1);
-            T kernel[2*r + 1][2*r + 1];
+            T** kernel = new T*[2*r + 1];
+            if (!kernel)
+                throw "Lab1::gabor: Insufficient memory to allocate kernel";
+            for (int i = 0; i < 2*r + 1; i++)
+            {
+                kernel[i] = new T[2*r + 1];
+                if (!kernel[i])
+                    throw "Lab1::gabor: Insufficient memory to allocate kernel";
+            }
             for (int i = 0; i < 2*r + 1; i++)
                 for (int j = 0; j < 2*r + 1; j++)
                 {
@@ -242,8 +288,11 @@ namespace Lab1
                     for (int _i = i - r, n = 0; _i <= i + r; _i++, n++)
                         for (int _j = j - r, k = 0; _j <= j + r; _j++, k++)
                             (*dst)(i, j) += kernel[n][k] * (*src)(_i, _j);
+            for (int i = 0; i < 2*r + 1; i++)
+                delete[] kernel[i];
+            delete[] kernel;
             return dst;
         }
-}
+} /* namespace Lab1 */
 
-#endif //_LAB1_H_
+#endif /* _LAB1_H_ */
