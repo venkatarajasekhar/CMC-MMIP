@@ -184,6 +184,7 @@ namespace Lab1
                     std::sort(array, array + (2*r + 1) * (2*r + 1));
                     (*dst)(i, j) = array[2*r*(r + 1) + 1];
                 }
+            delete[] array;
             return dst;
         }
     
@@ -216,6 +217,7 @@ namespace Lab1
                 for (int i = 0; i < src->height(); i++)
                     for (int n = i - r, k = 0; n <= i + r; n++, k++)
                         (*dst)(i, j) += kernel[k] * (*med)(n, j);
+            delete[] kernel;
             delete med;
             return dst;
         }
@@ -250,6 +252,7 @@ namespace Lab1
                 for (int i = 0; i < src->height(); i++)
                     for (int n = i - r, k = 0; n <= i + r; n++, k++)
                         (*y)(i ,j) += kernel[k] * (*src)(n, j);
+            delete[] kernel;
             for (int i = 0; i < src->height(); i++)
                 for (int j = 0; j < src->width(); j++)
                     (*dst)(i, j) = (float)sqrt(pow((*x)(i, j), 2) + pow((*y)(i, j), 2));
