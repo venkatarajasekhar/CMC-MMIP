@@ -20,6 +20,49 @@ size_t _row_length(size_t width, int bits)
     return (bytes_per_row + 3) / 4 * 4;
 }
 
+void BmpRead::_read_file_header()
+{
+    fseek(_file, 0, SEEK_SET);
+    if (!fread(&_header._w_type, sizeof(uint16_t), 1, _file))
+        throw "BmpRead: File header could not be read";
+    if (!fread(&_header._dw_file_size, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: File header could not be read";
+    if (!fread(&_header._w_reserved_1, sizeof(uint16_t), 1, _file))
+        throw "BmpRead: File header could not be read";
+    if (!fread(&_header._w_reserved_2, sizeof(uint16_t), 1, _file))
+        throw "BmpRead: File header could not be read";
+    if (!fread(&_header._dw_offset, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: File header could not be read";
+    return;
+}
+void BmpRead::_read_info_header()
+{
+    fseek(_file, 0xe, SEEK_SET);
+    if (!fread(&_info._dw_size_of_header, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_width, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_height, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._w_planes, sizeof(uint16_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._w_bit_count, sizeof(uint16_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_compression_method, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_size_of_image, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_pixels_per_X, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_pixels_per_Y, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_colors, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    if (!fread(&_info._dw_important_colors, sizeof(uint32_t), 1, _file))
+        throw "BmpRead: Info header could not be read";
+    return;
+}
+
 BmpRead::BmpRead(const char* filename)
 {
     try
@@ -28,20 +71,12 @@ BmpRead::BmpRead(const char* filename)
         _file = fopen(filename, "rb");
         if (!_file)
             throw "BmpRead: File could not be opened";
-        fseek(_file, 0, SEEK_SET);
-        /* file header loading */
-        if (!fread(&_header, sizeof(_header), 1, _file))
-            throw "BmpRead: File header could not be read";
-        /* check if file is BMP image */
+        _read_file_header();
         if (_header._w_type != 0x4d42)
             throw "BmpRead: File is not BMP file";
-        /* info header loading */
-        if (!fread(&_info, sizeof(_info), 1, _file))
-            throw "BmpRead: Info header could not be read";
-        /* check if compression method is compatible */
+        _read_info_header();
         if (_info._dw_compression_method)
             throw "BmpRead: Incompatible compression method";
-
         /* field initialization */
         _data_offset = _header._dw_offset;
         _bytes_per_row = _row_length(_info._dw_width, _info._w_bit_count);
@@ -53,19 +88,17 @@ BmpRead::BmpRead(const char* filename)
                 _palette = new unsigned char[_size_of_palette * 4];
                 if (!_palette)
                     throw "BmpRead: Insufficient memory to allocate palette";
-                fseek(_file, sizeof(_header) + _info._dw_size_of_header, SEEK_SET);
+                fseek(_file, _size_of_header + _size_of_info, SEEK_SET);
                 if (!fread(_palette, sizeof(*_palette), _size_of_palette * 4, _file))
                     throw "BmpRead: Color palette could not be read";
                 break;
             case 24:
                 _image_type = BT_RGB;
                 _size_of_palette = 0;
-                _palette = NULL;
                 break;
             case 32:
                 _image_type = BT_RGBX;
                 _size_of_palette = 0;
-                _palette = NULL;
                 break;
             default:
                 throw "BmpRead: Not supported type of pixel format";
@@ -100,6 +133,51 @@ int BmpRead::read(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length)
     return fread(pixel, sizeof(*pixel), length, _file);
 }
 
+
+void BmpWrite::_write_file_header()
+{
+    fseek(_file, 0, SEEK_SET);
+    if (!fwrite(&_header._w_type, sizeof(uint16_t), 1, _file))
+        throw "BmpWrite: File header could not be written";
+    if (!fwrite(&_header._dw_file_size, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: File header could not be written";
+    if (!fwrite(&_header._w_reserved_1, sizeof(uint16_t), 1, _file))
+        throw "BmpWrite: File header could not be written";
+    if (!fwrite(&_header._w_reserved_2, sizeof(uint16_t), 1, _file))
+        throw "BmpWrite: File header could not be written";
+    if (!fwrite(&_header._dw_offset, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: File header could not be written";
+    return;
+}
+
+void BmpWrite::_write_info_header()
+{
+    fseek(_file, 0xe, SEEK_SET);
+    if (!fwrite(&_info._dw_size_of_header, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_width, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_height, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._w_planes, sizeof(uint16_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._w_bit_count, sizeof(uint16_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_compression_method, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_size_of_image, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_pixels_per_X, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_pixels_per_Y, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_colors, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    if (!fwrite(&_info._dw_important_colors, sizeof(uint32_t), 1, _file))
+        throw "BmpWrite: Info header could not be written";
+    return;
+}
+
 BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::Type type)
 {
     try
@@ -122,26 +200,24 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
                 break;
             case BT_RGB:
                 _size_of_palette = 0;
-                _palette = NULL;
                 bits = 24;
                 break;
             case BT_RGBX:
                 bits = 32;
                 _size_of_palette = 0;
-                _palette = NULL;
                 break;
             default:
                 throw "BmpWrite: Not supported type of pixel format";
         };
         _bytes_per_row = _row_length(width, bits);
-        _data_offset = sizeof(_header) + sizeof(_info) + (bits > 8 ? 0 : 4 * (1 << bits));
+        _data_offset = _size_of_header + _size_of_info + (bits > 8 ? 0 : 4 * (1 << bits));
         
         /* file header and info header creating */
         _header._w_type = 0x4d42;
         _header._w_reserved_1 = 0;
         _header._w_reserved_2 = 0;
         _header._dw_offset = _data_offset;
-        _info._dw_size_of_header = sizeof(_info);
+        _info._dw_size_of_header = _size_of_info;
         _info._dw_width = (unsigned int) width;
         _info._dw_height = (unsigned int) height;
         _info._w_planes = 1;
@@ -158,13 +234,8 @@ BmpWrite::BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::
         if (!_file)
             throw "BmpWrite: File could not be opened";
         fseek(_file, 0, SEEK_SET);
-        /* file header saving */
-        if (!fwrite(&_header, sizeof(_header), 1, _file))
-            throw "BmpWrite: File header could not be saved";
-        /* info header saving */
-        if (!fwrite(&_info, sizeof(_info), 1, _file))
-            throw "BmpWrite: Info header could not be saved";
-        /* palette saving */
+        _write_file_header();
+        _write_info_header();
         if (_palette && !fwrite(_palette, sizeof(*_palette), _size_of_palette * 4, _file))
             throw "BmpWrite: Color palette could not be saved";
     }
