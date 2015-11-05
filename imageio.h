@@ -123,8 +123,7 @@ namespace ImageIO
         }
         catch (const char* ex)
         {
-            fprintf(stderr, "Image %s could not be loaded because of exception:\n%s\n", filename, ex);
-            return NULL;
+            throw;
         }
     }
 
@@ -156,8 +155,7 @@ namespace ImageIO
         {
             if (_data)
                 delete[] _data;
-            fprintf(stderr, "Image %s could not be saved because of exception:\n%s\n", filename, ex);
-            return -1;
+            throw;
         }
     }
 
