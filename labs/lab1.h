@@ -289,6 +289,28 @@ namespace Lab1
             delete[] kernel;
             return dst;
         }
+
+    template <class T>
+        Image<T>* vessels(Image<T>* src, float sigma)
+        {
+            const float _lambda = 2 * sigma;
+            const float _gamma = 1;
+            float _theta = 0;
+            Image<T>* dst = gabor(src, sigma, _gamma, _theta, _lambda, 0);
+            for (_theta += 10; _theta < 180; _theta += 10)
+            {
+                Image<T>* cur = gabor(src, sigma, _gamma, _theta, _lambda, 0);
+                for (int i = 0; i < src->height(); i++)
+                    for (int j = 0; j < src->width(); j++)
+                        (*dst)(i, j) = std::min((*dst)(i, j), (*cur)(i, j));
+                delete cur;
+            }
+            for (int i = 0; i < src->height(); i++)
+                for (int j = 0; j < src->width(); j++)
+                    (*dst)(i, j) = (*dst)(i, j) < 0 ? fabs((*dst)(i, j)) : 0;
+            return dst;
+        }
+
 } /* namespace Lab1 */
 
 #endif /* _LAB1_H_ */
