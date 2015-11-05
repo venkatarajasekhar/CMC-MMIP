@@ -3,7 +3,7 @@ XX ?= g++
 # Project directory
 PROJECT= ${PWD}
 # Flags
-CFLAGS = -Wall
+CFLAGS = -Wall -O2
 INCLUDES = -I$(PROJECT) -I$(PROJECT)/image -I$(PROJECT)/labs
 LFLAGS = -L$(PROJECT)/image
 LIBS = -lbmpio

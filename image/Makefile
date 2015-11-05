@@ -3,7 +3,7 @@ XX ?= g++
 # Lib directory
 IMAGE = ${PWD}
 # Flags
-CFLAGS = -Wall
+CFLAGS = -Wall -O2
 # Files
 SOURCES = bmpio.cpp
 TARGETS = $(SOURCES:.cpp=.o)
