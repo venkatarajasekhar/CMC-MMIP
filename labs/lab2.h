@@ -34,6 +34,24 @@ namespace Lab2
         return dst;
     }
 
+    template <class T>
+    Image<T>* downsample(Image<T>* src, float scale)
+    {
+        const int _width = src->width();
+        const int _height = src->height();
+        const int new_width = (int)(_width / scale);
+        const int new_height = (int)(_height / scale);
+        Image<T>* dst = new Image<T>(new_width, new_height);
+        if (!dst)
+            throw "Lab2::downsample: Insufficient memory to allocate output image";
+        Image<T>* med = Lab1::gauss(src, sqrt(scale*scale - 1));
+        for (int i = 0, y = 0; i < new_height; i++, y += (int)(scale))
+            for (int j = 0, x = 0; j < new_width; j++, x += (int)(scale))
+                (*dst)(i, j) = (*med)(y, x);
+        delete med;
+        return dst;
+    }
+
 } /* namespace Lab2 */
 
 #endif /* _LAB2_H_ */

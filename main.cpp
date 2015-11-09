@@ -54,6 +54,9 @@ int main(int argc, char **argv)
         if (!strcmp(argv[3], "up_bilinear") && argc == 5)
             output = Lab2::up_bilinear(input, atof(argv[4]));
         else
+        if (!strcmp(argv[3], "downsample") && argc == 5)
+            output = Lab2::downsample(input, atof(argv[4]));
+        else
             throw "Usage: ./out (input_image) (output_image) (command) [parameters...]";
 
         delete input;
