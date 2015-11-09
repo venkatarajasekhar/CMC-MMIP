@@ -3,6 +3,7 @@
 #include "image.h"
 #include "imageio.h"
 #include "lab1.h"
+#include "lab2.h"
 
 int main(int argc, char **argv)
 {
@@ -49,6 +50,9 @@ int main(int argc, char **argv)
         else
         if (!strcmp(argv[3], "vessels") && argc == 5)
             output = Lab1::vessels(input, atof(argv[4]));
+        else
+        if (!strcmp(argv[3], "up_bilinear") && argc == 5)
+            output = Lab2::up_bilinear(input, atof(argv[4]));
         else
             throw "Usage: ./out (input_image) (output_image) (command) [parameters...]";
 
