@@ -76,6 +76,40 @@ namespace Lab2
         return (float)(10 * log10(255 * 255 / mse_metric(orig, src)));
     }
 
+    template <class T>
+    float ssim_metric(Image<T>* orig, Image<T>* src)
+    {
+        float _ev_x = 0.0f, _ev_y = 0.0f;
+        float _var_x = 0.0f, _var_y = 0.0f;
+        float _cov = 0.0f;
+        const float _c1 = (float)(0.03 * 255);
+        const float _c2 = (float)(0.01 * 255);
+        const size_t _width = orig->width();
+        const size_t _height = orig->height();
+        if (_width != src->width() || _height != src->height())
+            throw "Lab2::ssim_metric: Image's dimensions are not equal";
+        for (int i = 0; i < _height; i++)
+            for (int j = 0; j < _width; j++)
+            {
+                _ev_x += (*orig)(i, j);
+                _ev_y += (*src)(i, j);
+            }
+        _ev_x /= _width * _height;
+        _ev_y /= _width * _height;
+        for (int i = 0; i < _height; i++)
+            for (int j = 0; j < _width; j++)
+            {
+                _var_x += pow((*orig)(i, j) - _ev_x, 2);
+                _var_y += pow((*src)(i, j) - _ev_y, 2);
+                _cov += ((*orig)(i, j) - _ev_x) * ((*src)(i, j) - _ev_y);
+            }
+        _var_x /= _width * _height - 1;
+        _var_y /= _width * _height - 1;
+        _cov /= _width * _height - 1;
+        return (float)(((2 * _ev_x * _ev_y + _c1) * (2 * _cov + _c2)) /
+                ((pow(_ev_x, 2) + pow(_ev_y, 2) + _c1) * (_var_x + _var_y + _c2)));
+    }
+
 } /* namespace Lab2 */
 
 #endif /* _LAB2_H_ */
