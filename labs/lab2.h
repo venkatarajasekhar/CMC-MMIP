@@ -110,6 +110,32 @@ namespace Lab2
                 ((pow(_ev_x, 2) + pow(_ev_y, 2) + _c1) * (_var_x + _var_y + _c2)));
     }
 
+    template <class T>
+    float mssim_metric(Image<T>* orig, Image<T>* src)
+    {
+        float _result = 0.0f;
+        const size_t _width = orig->width();
+        const size_t _height = orig->height();
+        if (_width != src->width() || _height != src->height())
+            throw "Lab2::mssim_metric: Image's dimensions are not equal";
+        const int _blocks_per_x = _width / 8;
+        const int _blocks_per_y = _height / 8;
+        GrayscaleFloatImage* _block_orig = new GrayscaleFloatImage(8, 8);
+        GrayscaleFloatImage* _block_src = new GrayscaleFloatImage(8, 8);
+        for (int i = 0; i < _blocks_per_y; i++)
+            for (int j = 0; j < _blocks_per_x; j++)
+            {
+                for (int y = 0; y < 8; y++)
+                    for (int x = 0; x < 8; x++)
+                    {
+                        (*_block_orig)(i, j) = (*orig)(i * 8 + y, j * 8 + x);
+                        (*_block_src)(i, j) = (*src)(i * 8 + y, j * 8 + x);
+                    }
+                _result += ssim_metric(_block_orig, _block_src);
+            }
+        return _result / (_blocks_per_x * _blocks_per_y);
+    }
+
 } /* namespace Lab2 */
 
 #endif /* _LAB2_H_ */
