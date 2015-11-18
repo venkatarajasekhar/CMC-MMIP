@@ -52,6 +52,20 @@ namespace Lab2
         return dst;
     }
 
+    template <class T>
+    float mse_metric(Image<T>* orig, Image<T>* src)
+    {
+        float _result = 0.0f;
+        const size_t _width = orig->width();
+        const size_t _height = orig->height();
+        if (_width != src->width() || _height != src->height())
+            throw "Lab2::mse_metric: Image's dimensions are not equal";
+        for (int i = 0; i < _height; i++)
+            for (int j = 0; j < _width; j++)
+                _result += pow((*orig)(i, j) - (*src)(i, j), 2);
+        return _result / (_width * _height);
+    }
+
 } /* namespace Lab2 */
 
 #endif /* _LAB2_H_ */
