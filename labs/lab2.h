@@ -66,6 +66,16 @@ namespace Lab2
         return _result / (_width * _height);
     }
 
+    template <class T>
+    float psnr_metric(Image<T>* orig, Image<T>* src)
+    {
+        const size_t _width = orig->width();
+        const size_t _height = orig->height();
+        if (_width != src->width() || _height != src->height())
+            throw "Lab2::psnr_metric: Image's dimensions are not equal";
+        return (float)(10 * log10(255 * 255 / mse_metric(orig, src)));
+    }
+
 } /* namespace Lab2 */
 
 #endif /* _LAB2_H_ */
