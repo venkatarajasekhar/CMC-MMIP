@@ -78,6 +78,11 @@ int main(int argc, char **argv)
             second_image = Lab2::up_bilinear(first_image, atof(argv[4]));
             ImageIO::write(argv[2], second_image);
         } else
+        if (!strcmp(argv[3], "up_bicubic") && argc == 5)
+        {
+            second_image = Lab2::up_bicubic(first_image, atof(argv[4]));
+            ImageIO::write(argv[2], second_image);
+        } else
         if (!strcmp(argv[3], "downsample") && argc == 5)
         {
             second_image = Lab2::downsample(first_image, atof(argv[4]));

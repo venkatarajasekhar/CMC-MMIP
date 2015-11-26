@@ -35,6 +35,46 @@ namespace Lab2
     }
 
     template <class T>
+    Image<T>* up_bicubic(Image<T>* src, float scale)
+    {
+        const int _width = src->width();
+        const int _height = src->height();
+        const int new_width = (int)(_width * scale);
+        const int new_height = (int)(_height * scale);
+        Image<T>* dst = new Image<T>(new_width, new_height);
+        if (!dst)
+            throw "Lab2::up_bicubic: Insufficient memory to allocate output image";
+        for (int i = 0; i < new_height; i++)
+        {
+            int src_y = (int)floor((float)(i) / new_height * _height);
+            float y = (float)(i) / new_height * _height - src_y;
+            for (int j = 0; j < new_width; j++)
+            {
+                int src_x = (int)floor((float)(j) / new_width * _width);
+                float x = (float)(j) / new_width * _width - src_x;
+                (*dst)(i, j) =
+                    (*src)(src_y - 1, src_x - 1) * x*(x-1)*(x-2)*y*(y-1)*(y-2) / 36 -
+                    (*src)(src_y - 1, src_x) * (x+1)*(x-1)*(x-2)*y*(y-1)*(y-2) / 12 +
+                    (*src)(src_y - 1, src_x + 1) * (x+1)*x*(x-2)*y*(y-1)*(y-2) / 12 -
+                    (*src)(src_y - 1, src_x + 2) * (x+1)*x*(x-1)*y*(y-1)*(y-2) / 36 -
+                    (*src)(src_y, src_x - 1) * x*(x-1)*(x-2)*(y+1)*(y-1)*(y-2) / 12 +
+                    (*src)(src_y, src_x) * (x+1)*(x-1)*(x-2)*(y+1)*(y-1)*(y-2) / 4 -
+                    (*src)(src_y, src_x + 1) * (x+1)*x*(x-2)*(y+1)*(y-1)*(y-2) / 4 +
+                    (*src)(src_y, src_x + 2) * (x+1)*x*(x-1)*(y+1)*(y-1)*(y-2) / 12 +
+                    (*src)(src_y + 1, src_x - 1) * x*(x-1)*(x-2)*(y+1)*y*(y-2) / 12 -
+                    (*src)(src_y + 1, src_x) * (x+1)*(x-1)*(x-2)*(y+1)*y*(y-2) / 4 +
+                    (*src)(src_y + 1, src_x + 1) * (x+1)*x*(x-2)*(y+1)*y*(y-2) / 4 -
+                    (*src)(src_y + 1, src_x + 2) * (x+1)*x*(x-1)*(y+1)*y*(y-2) / 12 -
+                    (*src)(src_y + 2, src_x - 1) * x*(x-1)*(x-2)*(y+1)*y*(y-1) / 36 +
+                    (*src)(src_y + 2, src_x) * (x+1)*(x-1)*(x-2)*(y+1)*y*(y-1) / 12 -
+                    (*src)(src_y + 2, src_x + 1) * (x+1)*x*(x-2)*(y+1)*y*(y-1) / 12 +
+                    (*src)(src_y + 2, src_x + 2) * (x+1)*x*(x-1)*(y+1)*y*(y-1) / 36;
+            }
+        }
+        return dst;
+    }
+
+    template <class T>
     Image<T>* downsample(Image<T>* src, float scale)
     {
         const int _width = src->width();
