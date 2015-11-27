@@ -259,12 +259,11 @@ namespace Lab1
             kernel[i] /= norm;
         for (int i = 0; i < _height; i++)
             for (int j = 0; j < _width; j++)
-                for (int n = j - r, k = 0; n <= j + r; n++, k++)
-                    (*x)(i, j) += kernel[k] * (*src)(i, n);
-        for (int j = 0; j < _width; j++)
-            for (int i = 0; i < _height; i++)
-                for (int n = i - r, k = 0; n <= i + r; n++, k++)
-                    (*y)(i ,j) += kernel[k] * (*src)(n, j);
+                for (int n = -r, k = 0; n <= r; n++, k++)
+                {
+                    (*x)(i, j) += kernel[k] * (*src)(i, j + n);
+                    (*y)(i ,j) += kernel[k] * (*src)(i + n, j);
+                }
         delete[] kernel;
         for (int i = 0; i < _height; i++)
             for (int j = 0; j < _width; j++)
