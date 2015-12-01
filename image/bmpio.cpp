@@ -264,5 +264,5 @@ BmpWrite::Type BmpWrite::type() const { return _image_type; }
 int BmpWrite::write(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length)
 {
     fseek(_file, _data_offset + (_info._dw_height - 1 - i) * _bytes_per_row + j, SEEK_SET);
-    return fwrite(pixel, sizeof(*pixel), length, _file);
+    return fwrite(pixel, sizeof(*pixel), _bytes_per_row, _file);
 }
