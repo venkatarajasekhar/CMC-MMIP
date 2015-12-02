@@ -234,21 +234,17 @@ namespace Lab1
     }
 
     template <class T>
-    Image<T>* gradient(Image<T>* src, float sigma)
+    Image<T>* gauss_fst_der(Image<T>* src, float sigma, const char* dir)
     {
         const size_t _width = src->width();
         const size_t _height = src->height();
         Image<T>* dst = new Image<T>(_width, _height);
         if (!dst)
-            throw "Lab1::gradient: Insufficient memory to allocate output image";
-        Image<T>* x = new Image<T>(_width, _height);
-        Image<T>* y = new Image<T>(_width, _height);
-        if (!x || !y)
-            throw "Lab1::gradient: Insufficient memory to allocate mediocre image";
+            throw "Lab1::gauss_fst_der: Insufficient memory to allocate output image";
         int r = (int)(3*sigma);
         T* kernel = new T[2*r + 1];
         if (!kernel)
-            throw "Lab1::gradient: Insufficient memory to allocate kernel";
+            throw "Lab1::gauss_fst_der: Insufficient memory to allocate kernel";
         T norm = 0;
         for (int i = 0; i < 2*r + 1; i++)
         {
@@ -257,14 +253,30 @@ namespace Lab1
         }
         for (int i = 0; i < 2*r + 1; i++)
             kernel[i] /= norm;
-        for (int i = 0; i < _height; i++)
-            for (int j = 0; j < _width; j++)
-                for (int n = -r, k = 0; n <= r; n++, k++)
-                {
-                    (*x)(i, j) += kernel[k] * (*src)(i, j + n);
-                    (*y)(i ,j) += kernel[k] * (*src)(i + n, j);
-                }
+        if (!strcmp(dir, "x"))
+            for (int i = 0; i < _height; i++)
+                for (int j = 0; j < _width; j++)
+                    for (int n = -r, k = 0; n <= r; n++, k++)
+                        (*dst)(i, j) += kernel[k] * (*src)(i, j + n);
+        if (!strcmp(dir, "y"))
+            for (int i = 0; i < _height; i++)
+                for (int j = 0; j < _width; j++)
+                    for (int n = -r, k = 0; n <= r; n++, k++)
+                        (*dst)(i, j) += kernel[k] * (*src)(i + n, j);
         delete[] kernel;
+        return dst;
+    }
+
+    template <class T>
+    Image<T>* gradient(Image<T>* src, float sigma)
+    {
+        const size_t _width = src->width();
+        const size_t _height = src->height();
+        Image<T>* dst = new Image<T>(_width, _height);
+        if (!dst)
+            throw "Lab1::gradient: Insufficient memory to allocate output image";
+        Image<T>* x = gauss_fst_der(src, sigma, "x");
+        Image<T>* y = gauss_fst_der(src, sigma, "y");
         for (int i = 0; i < _height; i++)
             for (int j = 0; j < _width; j++)
                 (*dst)(i, j) = (float)sqrt(pow((*x)(i, j), 2) + pow((*y)(i, j), 2));
