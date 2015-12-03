@@ -85,10 +85,18 @@ namespace Lab2
         if (!dst)
             throw "Lab2::downsample: Insufficient memory to allocate output image";
         Image<T>* med = Lab1::gauss(src, sqrt(scale*scale - 1));
-        float src_x = 0, src_y = 0;
-        for (int i = 0; i < new_height; i++, src_y += scale, src_x = 0)
-            for (int j = 0; j < new_width; j++, src_x += scale)
-                (*dst)(i, j) = (*med)((int)src_y, (int)src_x);
+        float orig_x = 0, orig_y = 0;
+        for (int i = 0; i < new_height; i++, orig_y += scale, orig_x = 0)
+            for (int j = 0; j < new_width; j++, orig_x += scale)
+            {
+                int src_x = (int)floor(orig_x);
+                int src_y = (int)floor(orig_y);
+                (*dst)(i, j) =
+                    (*med)(src_y, src_x) * (src_x + 1 - orig_x) * (src_y + 1 - orig_y) +
+                    (*med)(src_y, src_x + 1) * (orig_x - src_x) * (src_y + 1 - orig_y) +
+                    (*med)(src_y + 1, src_x) * (src_x + 1 - orig_x) * (orig_y - src_y) +
+                    (*med)(src_y + 1, src_x + 1) * (orig_x - src_x) * (orig_y - src_y);
+            }
         delete med;
         return dst;
     }
