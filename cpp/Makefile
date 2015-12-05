@@ -1,30 +1,24 @@
 # Compiler
 XX ?= g++
 # Project directory
-PROJECT= ${PWD}
+CPP= ${CURDIR}
 # Flags
 CFLAGS = -Wall -O2
-INCLUDES = -I$(PROJECT) -I$(PROJECT)/image -I$(PROJECT)/labs
-LFLAGS = -L$(PROJECT)/image
-LIBS = -lbmpio
+INCLUDES = -I$(CPP) -I$(CPP)/io -I$(CPP)/labs -I$(CPP)/image
 # Files
-SOURCES = main.cpp
+SOURCES = $(CPP)/main.cpp
 TARGETS = $(SOURCES:.cpp=.o)
-EXECUTABLE = out
 
-all: $(EXECUTABLE)
-
-$(EXECUTABLE): lib $(TARGETS)
-	$(XX) -o $@ $(TARGETS) $(LFLAGS) $(LIBS)
+all: $(TARGETS)
 
 %.o: %.cpp
 	$(XX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 lib:
-	$(MAKE) -C image
+	$(MAKE) -C io
 
 .PHONY: all clean lib
 
 clean:
-	$(RM) *.o *~ $(EXECUTABLE)
-	cd $(PROJECT)/image && $(MAKE) clean
+	$(RM) *.o *~
+	$(MAKE) clean -C io

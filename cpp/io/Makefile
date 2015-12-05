@@ -1,15 +1,15 @@
 # Compiler
 XX ?= g++
 # Lib directory
-IMAGE = ${PWD}
+IO = ${CURDIR}
 # Flags
 CFLAGS = -Wall -O2
 # Files
-SOURCES = bmpio.cpp
+SOURCES = $(IO)/bmpio.cpp
 TARGETS = $(SOURCES:.cpp=.o)
-STATIC = libbmpio.a
+STATIC = $(IO)/libbmpio.a
 
-all: $(STATIC)
+default: $(STATIC)
 
 %.o: %.cpp
 	$(XX) $(CFLAGS) -c $< -o $@
@@ -18,7 +18,7 @@ $(STATIC): $(TARGETS)
 	ar rvsc $@ $<
 	ranlib $@
 
-.PHONY: all clean
+.PHONY: default clean
 
 clean:
 	$(RM) *.o *~ $(STATIC)
