@@ -3,21 +3,23 @@
 
 #include <cstddef>
 #include <cstring>
+#include <stdint.h>
 
 /* 
  * Template for base image type
  */
-template<class PixelType>
+template<class T>
 class Image
 {
     private:
         size_t _width;
         size_t _height;
-        PixelType *_data;
+        T *_data;
     public:
-        Image(size_t width, size_t height);
+        Image(const size_t width, const size_t height);
+        Image(const size_t width, const size_t height, const uint8_t* data);
         ~Image();
-        PixelType& operator() (size_t row, size_t col);
+        T& operator() (const size_t row, const size_t col);
         size_t width() const;
         size_t height() const;
 };
@@ -25,26 +27,33 @@ class Image
 /*
  * Implementation of Image template
  */
-template <class PixelType>
-Image<PixelType>::Image(size_t width, size_t height): _width(width), _height(height)
+template <class T>
+Image<T>::Image(const size_t width, const size_t height):
+    _width(width), _height(height)
 {
-    _data = new PixelType[_width * _height];
-    if (!_data)
-        throw "Image: Insufficient memory to allocate raw data";
-    std::memset(_data, 0, _width * _height * sizeof(PixelType));
+    _data = new T[_width * _height];
+    std::memset(_data, 0, _width * _height * sizeof(T));
 }
 
-template <class PixelType>
-Image<PixelType>::~Image() { delete[] _data; }
+template <class T>
+Image<T>::Image(const size_t width, const size_t height, const uint8_t* data):
+    _width(width), _height(height)
+{
+    _data = new T[_width * _height];
+    std::memcpy(_data, data, _width * _height);
+}
 
-template <class PixelType>
-size_t Image<PixelType>::width() const { return _width; }
+template <class T>
+Image<T>::~Image() { delete[] _data; }
 
-template <class PixelType>
-size_t Image<PixelType>::height() const { return _height; }
+template <class T>
+size_t Image<T>::width() const { return _width; }
 
-template <class PixelType>
-PixelType& Image<PixelType>::operator() (size_t row, size_t col)
+template <class T>
+size_t Image<T>::height() const { return _height; }
+
+template <class T>
+T& Image<T>::operator() (const size_t row, const size_t col)
 {
     size_t i = row;
     size_t j = col;
