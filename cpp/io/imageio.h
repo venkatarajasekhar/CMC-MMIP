@@ -1,163 +1,144 @@
 #ifndef _IMAGEIO_H_
 #define _IMAGEIO_H_
 
+#include <stdint.h>
 #include "image.h"
 #include "bmpio.h"
 
 namespace ImageIO
 {
     template<class T>
-    static Image<T>* _bmp_indexed_read(BmpRead& bmp_input)
+    static Image<T> _bmp_indexed_read(BmpRead& bmp_input)
     {
         const int _width = bmp_input.width();
         const int _height = bmp_input.height();
-        Image<T>* _input = new Image<T>(_width, _height);
-        unsigned char* _data = NULL;
-        unsigned char* _rgb = NULL;
+        Image<T> _input(_width, _height);
+        uint8_t* _row = nullptr;
+        uint8_t _rgb[3];
         try
         {
-            _data = new unsigned char[_width];
-            if (!_data)
-                throw "ImageIO::read(indexed): Insufficient memory to allocate data buffer";
-            _rgb = new unsigned char[3];
-            if (!_rgb)
-                throw "ImageIO::read(indexed): Insufficient memory to allocate palette buffer";
+            _row = new uint8_t[_width];
             for (int i = _height - 1; i >= 0; i--)
             {
-                bmp_input.read(_data, i, 0, _width);
+                bmp_input.read(_row, i, 0, _width);
                 for (int j = 0; j < _width; j++)
                 {
-                    bmp_input.Paleterize(_rgb, _data[j]);
-                    (*_input)(i, j) = 0.1140 * _rgb[0] + 0.5871 * _rgb[1] + 0.2989 * _rgb[2];
+                    bmp_input.Paleterize(_rgb, _row[j]);
+                    _input(i, j) = 0.114 * _rgb[0] + 0.5871 * _rgb[1] + 0.2989 * _rgb[2];
                 }
             }
-            delete[] _data;
-            delete[] _rgb;
+            delete[] _row;
             return _input;
         }
         catch (const char* ex)
         {
-            if (_data)
-               delete[] _data;
-            if (_rgb)
-                delete[] _rgb;
+            if (_row)
+               delete[] _row;
             throw;
         }
     }
 
     template<class T>
-    static Image<T>* _bmp_rgb_read(BmpRead& bmp_input)
+    static Image<T> _bmp_rgb_read(BmpRead& bmp_input)
     {
         const int _width = bmp_input.width();
         const int _height = bmp_input.height();
-        Image<T>* _input = new Image<T>(_width, _height);
-        unsigned char* _data = NULL;
+        Image<T> _input(_width, _height);
+        uint8_t* _row = nullptr;
         try
         {
-            _data = new unsigned char[_width * 3];
-            if (!_data)
-                throw "ImageIO::read(rgb): Insufficient memory to allocate data buffer";
+            _row = new uint8_t[_width * 3];
             for (int i = _height - 1; i >= 0; i--)
             {
-                bmp_input.read(_data, i, 0, _width * 3);
+                bmp_input.read(_row, i, 0, _width * 3);
                 for (int j = 0; j < _width; j++)
-                    (*_input)(i, j) = 0.1140 * _data[3*j] + 0.5871 * _data[3*j + 1] + 0.2989 * _data[3*j + 2];
+                    _input(i, j) = 0.114 * _row[3*j] + 0.5871 * _row[3*j + 1] + 0.2989 * _row[3*j + 2];
             }
-            delete[] _data;
+            delete[] _row;
             return _input;
         }
         catch (const char* ex)
         {
-            if (_data)
-                delete[] _data;
+            if (_row)
+                delete[] _row;
             throw;
         }
     }
 
     template<class T>
-    static Image<T>* _bmp_rgbx_read(BmpRead& bmp_input)
+    static Image<T> _bmp_rgbx_read(BmpRead& bmp_input)
     {
         const int _width = bmp_input.width();
         const int _height = bmp_input.height();
-        Image<T>* _input = new Image<T>(_width, _height);
-        unsigned char* _data = NULL;
+        Image<T> _input(_width, _height);
+        uint8_t* _row = nullptr;
         try
         {
-            _data = new unsigned char[_width * 4];
-            if (!_data)
-                throw "ImageIO::read(rgbx): Insufficient memory to allocate data buffer";
+            _row = new uint8_t[_width * 4];
             for (int i = _height - 1; i >= 0; i--)
             {
-                bmp_input.read(_data, i, 0, _width * 4);
+                bmp_input.read(_row, i, 0, _width * 4);
                 for (int j = 0; j < _width; j++)
-                (*_input)(i, j) = 0.1140 * _data[4*j] + 0.5871 * _data[4*j + 1] + 0.2989 * _data[4*j + 2];
+                    _input(i, j) = 0.114 * _row[4*j] + 0.5871 * _row[4*j + 1] + 0.2989 * _row[4*j + 2];
             }
-            delete[] _data;
+            delete[] _row;
             return _input;
         }
         catch (const char* ex)
         {
-            if (_data)
-                delete[] _data;
+            if (_row)
+                delete[] _row;
             throw;
         }
     }
 
     template<class T>
-    Image<T>* read(const char* filename)
+    Image<T> read(const char* filename)
     {
-        try
+        BmpRead _bmp_input(filename);
+        switch (_bmp_input.type())
         {
-            BmpRead _bmp_input(filename);
-            switch (_bmp_input.type())
-            {
-                case BmpRead::BT_INDEX:
-                    return _bmp_indexed_read<T>(_bmp_input);
-                case BmpRead::BT_RGB:
-                    return _bmp_rgb_read<T>(_bmp_input);
-                case BmpRead::BT_RGBX:
-                    return _bmp_rgbx_read<T>(_bmp_input);
-                default:
-                    throw "ImageIO::read: Not supported type of pixel format";
-            };
-        }
-        catch (const char* ex)
-        {
-            throw;
-        }
+            case BmpRead::BT_INDEX:
+                return _bmp_indexed_read<T>(_bmp_input);
+            case BmpRead::BT_RGB:
+                return _bmp_rgb_read<T>(_bmp_input);
+            case BmpRead::BT_RGBX:
+                return _bmp_rgbx_read<T>(_bmp_input);
+            default:
+                throw "ImageIO::read: Not supported type of pixel format";
+        };
     }
 
     template<class T>
-    int write(const char* filename, Image<T>* output)
+    int write(const char* filename, Image<T>&& output)
     {
-        const int _width = output->width();
-        const int _height = output->height();
-        unsigned char* _data = NULL;
+        const int _width = output.width();
+        const int _height = output.height();
+        uint8_t* _row = nullptr;
         try
         {
             BmpWrite _bmp_output(filename, _width, _height, BmpWrite::BT_INDEX);
-            _data = new unsigned char[_width];
-            if (!_data)
-                throw "ImageIO::write: Insufficient memory to allocate data buffer";
+            _row = new uint8_t[_width];
             for (int i = _height - 1; i >= 0; i--)
             {
                 for (int j = 0; j < _width; j++)
                 {
-                    T value = (*output)(i, j);
-                    _data[j] = (unsigned char)(value < 0 ? 0 : (value > 255 ? 255 : value));
+                    T value = output(i, j);
+                    _row[j] = (uint8_t)(value < 0 ? 0 : (value > 255 ? 255 : value));
                 }
-                _bmp_output.write(_data, i, 0, _width);
+                _bmp_output.write(_row, i, 0, _width);
             }
-            delete[] _data;
+            delete[] _row;
             return 0;
         }
         catch (const char* ex)
         {
-            if (_data)
-                delete[] _data;
+            if (_row)
+                delete[] _row;
             throw;
         }
     }
 
 } /* namespace ImageIO */
+
 #endif /* IMAGEIO_H_ */
