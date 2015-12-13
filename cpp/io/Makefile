@@ -3,9 +3,9 @@ XX ?= g++
 # Lib directory
 IO = ${CURDIR}
 # Flags
-CFLAGS = -Wall -O2
+CFLAGS = -std=c++0x -Wall -O2
 # Files
-SOURCES = $(IO)/bmpio.cpp
+SOURCES = $(IO)/bmpread.cpp $(IO)/bmpwrite.cpp
 TARGETS = $(SOURCES:.cpp=.o)
 STATIC = $(IO)/libbmpio.a
 
@@ -15,7 +15,7 @@ default: $(STATIC)
 	$(XX) $(CFLAGS) -c $< -o $@
 
 $(STATIC): $(TARGETS)
-	ar rvsc $@ $<
+	ar rvsc $@ $(TARGETS)
 	ranlib $@
 
 .PHONY: default clean

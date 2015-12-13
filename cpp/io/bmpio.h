@@ -37,7 +37,7 @@ struct BitmapInfoHeader
 class BmpRead
 {
     public:
-        /* Type of data: 8 or 24 bits for one pixel */
+        /* Type of data: 8, 24 or 32 bits for one pixel */
         enum Type
         {
             BT_INDEX,
@@ -51,25 +51,25 @@ class BmpRead
         size_t _data_offset;
         size_t _bytes_per_row;
         size_t _size_of_palette;
-        unsigned char* _palette;
+        uint8_t* _palette;
         Type _image_type;
         void _read_file_header();
         void _read_info_header();
     public:
         BmpRead(const char* filename);
-        virtual ~BmpRead();
+        ~BmpRead();
         size_t width() const;
         size_t height() const;
         size_t bits() const;
         Type type() const;
-        void Paleterize(unsigned char* rgb, short int index) const;
-        int read(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length);
+        void Paleterize(uint8_t* rgb, short int index) const;
+        int read(uint8_t* pixel, size_t i, size_t j, ptrdiff_t length);
 };
 
 class BmpWrite
 {
     public:
-        /* Type of data: 8 or 24 bits for one pixel */
+        /* Type of data: 8, 24 or 32 bits for one pixel */
         enum Type
         {
             BT_INDEX,
@@ -83,18 +83,18 @@ class BmpWrite
         size_t _data_offset;
         size_t _bytes_per_row;
         size_t _size_of_palette;
-        unsigned char* _palette;
+        uint8_t* _palette;
         Type _image_type;
         void _write_file_header();
         void _write_info_header();
     public:
         BmpWrite(const char* filename, size_t width, size_t height, BmpWrite::Type type);
-        virtual ~BmpWrite();
+        ~BmpWrite();
         size_t width() const;
         size_t height() const;
         size_t bits() const;
         Type type() const;
-        int write(unsigned char* pixel, size_t i, size_t j, ptrdiff_t length);
+        int write(uint8_t* pixel, size_t i, size_t j, ptrdiff_t length);
 };
 
 #endif /* _BMPIO_H_ */
