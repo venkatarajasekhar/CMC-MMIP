@@ -1,59 +1,28 @@
 # Mathematical Methods of Image Processing
-Репозиторий с заданиями по курсу "Современные методы обработки изображений"
+Repository with image processing library for C++
 
-## Bmp I/O
-Модуль для чтения и записи файлов в формате ```bmp```.  
-Поддерживается чтение изображений без компрессии, имеющие битности 8, 24, 32.
+## Image I/O
+* ```bmpio.h``` - module for reading and writing ```bmp``` files. Implemented for uncompressed 8-bit, 24-bit or 32-bit files.  
+* ```imageio.h``` - header with wrappers for unified interaction with image container.  
 
-## Задание 1
-В рамках данного задания был реализован следующий функционал:  
-1. Инверсия значений пикселей изображения  
-2. Отражение изображения по вертикали и по горизонтали  
-3. Поворот изображений по и против часовой стрелки на 90, 180 и 270 градусов  
-4. Фильтры, подсвечивающие контуры: фильтры Превитта, Собеля, Робертса  
-5. Медианная фильтрация с квадратным окном произвольного размера  
-6. Свёртка с фильтром Гаусса с произвольным выбором параметра — радиуса σ  
-7. Вычисление модуля градиента как корень из суммы квадратов свёрток с первой производной фильтра Гаусса по горизонтали и вертикали  
-8. Поворот изображения на произвольный угол с использованием билинейной интерполяции для устранения эффекта ступенчатости при повороте изображений с резкими контурами  
-9. Фильтр Габора с произвольными параметрами  
-10. Обнаружение сосудов на изображениях глазного дна с помощью фильтров Габора  
+## Transform
+Within this module were implemented following features:  
+1. `invert`     Inversion of image pixel values  
+2. `mirror {x|y}`       Reflection of the image vertically and horizontally  
+3. `rotate {cw|ccw} (angle)`        Rotation of images clockwise and counter-clockwise at any angle  
+4. `up_bilinear {s}`        Resampling of image using bilinear interpolation  
+5. `up_bicubic {s}`     Resampling of image using bicubic interpolation  
+6. `downsample {s}`     Downsampling of image using bilinear interpolation  
 
 **Usage:**  
 ```%programname% (input_image) (output_image) (command) [parameters...]```  
 
-**Список команд:**  
-* `invert`      Инверсия пикселей  
-* `mirror {x|y}`        Отражение по горизонтали или по вертикали, в зависомсти от указанного параметра  
-* `rotate {cw|ccw} (angle)`     Поворот по или против часовой стрелки на заданное количество градусов  
-* `prewitt {x|y}`       Фильтр Превитта, обнаруживающий горизонтальные или вертикальные контуры  
-* `sobel {x|y}`     Фильтр Собеля, обнаруживающий горизонтальные или вертикальные контуры  
-* `roberts {1|2}`      Фильтр Робертса, параметр — выбор диагонали  
-* `median (rad)`        Медианная фильтрация, параметр rad — целочисленный *радиус* фильтра  
-* `gauss (sigma)`       Фильтр Гаусса, параметр sigma — вещественный параметр фильтра  
-* `gradient (sigma)`        Модуль градиента  
-* `gabor (sigma) (gamma) (theta) (lambda) (psi)`      Свёртка с фильтром Габора (вещественной частью), углы задаются в градусах  
-* `vessels (sigma)`     Обнаружение сосудов заданного масштаба  
-
-Релиз этого задания можно скачать [здесь](https://github.com/igormunkin/MMIP/releases/tag/v0.1)
-## Задание 2
-В рамках данного задания был реализован следующий функционал:  
-1. Увеличение изображений в целое число раз с помощью билинейной интерполяции  
-2. Увеличение изображений в целое число раз с помощью бикубической интерполяции  
-3. Понижение разрешения изображений в целое число раз  
-4. Вычисление метрик сравнения изображений: MSE и PSNR  
-5. Вычисление метрик сравнения изображений: SSIM и MSSIM  
-6. Увеличение изображений в вещественное число раз с помощью билинейной интерполяции  
-7. Увеличение изображений в вещественное число раз с помощью бикубической интерполяции  
-8. Понижение разрешения изображений в вещественное число раз  
+## Metric
+Within this module were implemented following image quality metrics:  
+1. `mse`        Mean Square Error (MSE)  
+2. `psnr`       Peak Signal-to-Noise Ratio (PSNR)  
+3. `ssim`       Structural SIMilarity index (SSIM)  
+4. `mssim`      Mean Structural SIMilarity index (MSSIM)  
 
 **Usage:**  
-```%programname% (input_image) (output_image) (command) [parameters...]```  
-```%programname% (input_image_1) (input_image_2) (command)```  
-
-**Список команд:**  
-* `up_bilinear {s}`     Увеличение с помощью билинейной интерполяции в s раз  
-* `up_bicubic {s}`       Увеличение с помощью бикубической интерполяции в s раз  
-* `downsample {s}`       Уменьшение в s раз  
-* `metric {mse|psnr|ssim|mssim}`     Вычисление метрики между двумя входными изображениями, результат выводится числом на экран  
-
-Релиз этого задания можно скачать [здесь](https://github.com/igormunkin/MMIP/releases/tag/v0.2)
+```%programname% (input_image_1) (input_image_2) metric (parameter)```  
