@@ -4,6 +4,7 @@
 #include "imageio.h"
 #include "transform.h"
 #include "metric.h"
+#include "detection.h"
 
 int main(int argc, char **argv)
 {
@@ -54,6 +55,10 @@ int main(int argc, char **argv)
             else
                 throw "Incorrect usage for 'metric' method";
         }
+        else
+        if (!strcmp(argv[3], "sobel") && argc == 5)
+            ImageIO::write(argv[2],
+                    Detection::sobel(first_image, argv[4]));
         else
             throw "Usage: ./out (first_image) (second_image) (command) [parameters...]";
         return 0;
