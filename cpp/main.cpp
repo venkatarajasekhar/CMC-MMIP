@@ -24,15 +24,18 @@ int main(int argc, char **argv)
         else
         if (!strcmp(argv[3], "rotate") && argc == 6)
             ImageIO::write(argv[2],
-                    Transform::rotate(first_image, argv[4], atoi(argv[5])));
+                    Transform::rotate(first_image, argv[4],
+                        strtof(argv[5], nullptr)));
         else
         if (!strcmp(argv[3], "up_bilinear") && argc == 5)
             ImageIO::write(argv[2],
-                    Transform::up_bilinear(first_image, atof(argv[4])));
+                    Transform::up_bilinear(first_image,
+                        strtof(argv[4], nullptr)));
         else
         if (!strcmp(argv[3], "up_bicubic") && argc == 5)
             ImageIO::write(argv[2],
-                    Transform::up_bicubic(first_image, atof(argv[4])));
+                    Transform::up_bicubic(first_image,
+                        strtof(argv[4], nullptr)));
         else
         if (!strcmp(argv[3], "metric") && argc == 5)
         {
