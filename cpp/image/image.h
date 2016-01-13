@@ -11,6 +11,10 @@
 template<class T>
 class Image
 {
+    public:
+        static const uint8_t BLACK = 0;
+        static const uint8_t GRAY = 128;
+        static const uint8_t WHITE = 255;
     private:
         size_t _width;
         size_t _height;
@@ -40,7 +44,7 @@ Image<T>::Image(const size_t width, const size_t height):
     _width(width), _height(height)
 {
     _data = new T[_width * _height];
-    std::memset(_data, 0, _width * _height * sizeof(T));
+    std::memset(_data, Image<T>::BLACK, _width * _height * sizeof(T));
 }
 
 template <class T>

@@ -16,12 +16,12 @@ namespace Detection
             for (int i = 0; i < _height; i++)
                 for (int j = 0; j < _width; j++)
                     dst(i, j) = src(i + 1, j - 1) + 2 * src(i + 1, j) + src(i + 1, j + 1) -
-                        src(i - 1, j - 1) - 2 * src(i - 1, j) - src(i - 1, j + 1) + 128;
+                        src(i - 1, j - 1) - 2 * src(i - 1, j) - src(i - 1, j + 1) + Image<T>::GRAY;
         if (!strcmp(dir, "y"))
             for (int i = 0; i < _height; i++)
                 for (int j = 0; j < _width; j++)
                     dst(i, j) = src(i - 1, j - 1) + 2 * src(i, j - 1) + src(i + 1, j - 1) -
-                        src(i - 1, j + 1) - 2 * src(i, j + 1) - src(i + 1, j + 1) + 128;
+                        src(i - 1, j + 1) - 2 * src(i, j + 1) - src(i + 1, j + 1) + Image<T>::GRAY;
         return dst;
     }
 

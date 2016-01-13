@@ -124,7 +124,7 @@ namespace ImageIO
                 for (int j = 0; j < _width; j++)
                 {
                     T value = output(i, j);
-                    _row[j] = (uint8_t)(value < 0 ? 0 : (value > 255 ? 255 : value));
+                    _row[j] = (uint8_t)(value < 0 ? Image<T>::BLACK : (value > 255 ? Image<T>::WHITE : value));
                 }
                 _bmp_output.write(_row, i, 0, _width);
             }
