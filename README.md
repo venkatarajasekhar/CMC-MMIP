@@ -1,6 +1,7 @@
 # Mathematical Methods of Image Processing
+[![Build Status](https://travis-ci.org/igormunkin/CMC-MMIP.svg?branch=master)](https://travis-ci.org/igormunkin/CMC-MMIP)  
 Repository with image processing library for C++  
-Wiki with small description in Russian available [here](https://github.com/igormunkin/MMIP/wiki)
+Wiki with small description in Russian available [here](https://github.com/igormunkin/MMIP/wiki)  
 
 ## Image I/O
 * ```bmpio.h``` - module for reading and writing ```bmp``` files. Implemented for uncompressed 8-bit, 24-bit or 32-bit files.  
